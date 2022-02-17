@@ -64,7 +64,7 @@ const Xenon: React.FC<XenonProps> = ({ product, className }) => {
             {discount}
           </div>
         )}
-      </div>{product?.slug}
+      </div>
       {/* End of product image */}
 
       <header className="p-3 md:p-6">

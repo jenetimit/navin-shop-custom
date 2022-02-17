@@ -10,8 +10,29 @@ import {Item} from "../contexts/quick-cart/cart.utils";
 import { useDodState } from "src/pages/customoutfit.context";
 import AddToCartBtn from "@components/product/add-to-cart/add-to-cart-btn";
 import { useCart } from "@contexts/quick-cart/cart.context";
+import dynamic from "next/dynamic";
+import { useProductsQuery } from "@data/product/use-products.query";
+import { motion } from "framer-motion";
+import { Fragment } from "react";
+import { Category } from "@material-ui/icons";
+
+const Neon = dynamic(() => import("@components/product/product-card/neon"));
+const Xenon = dynamic(() => import("@components/product/product-card/xenon"));
 
 // import { CartItemType } from "./arrayindex";
+const ProductFeedLoader = dynamic(
+  () => import("@components/ui/loaders/product-feed-loader")
+);
+
+const renderProductCard = (product: any) => {
+  switch (product?.type?.slug) {
+    case "grocery":
+      return <Neon product={product} />;
+    default:
+      return <Xenon product={product} />;
+  }
+};
+
 export type CartItemType ={
     id: number;
     category: string;
@@ -48,75 +69,61 @@ const getProducts = [
     }
   ]
 
-  const otherProducts = [
-    {
-      id: 2,
-      category: "gloves",
-      description: "littile kingdom girls",
-      image:  "https://image.made-in-china.com/2f0j00gpwYDHFPHloI/Welcome-Customized-Baby-Mittens-0-24m-Infants-Gloves.jpg",
-      price: 51,
-      title: "baby gloves",
-      amount: "123",
-      slug: "magnetic-designs-women-printed-fit-and-flare-dress"
-      
-    },
-    {
-      id: 3,
-      category: "gloves",
-      description: "littile kingdom boys",
-      image: "https://5.imimg.com/data5/SELLER/Default/2020/10/CR/AX/QB/53567948/baby-hand-gloves-500x500.jpg",
-      price: 85,
-      title: "baby gloves",
-      amount: "123",
-      slug: "mango-self-striped-a-line-dress"
-    }
-  ]
+  // const {
+  //   isFetching: loading,
+  //   isFetchingNextPage: loadingMore,
+  //   fetchNextPage,
+  //   hasNextPage,
+  //   data,
+  //   error,
+  // } = useProductsQuery({
+  //   type: "clothing",
+  //   text: '',
+  //   category: 'main-dress-boys',
+  //   limit: 21,
+  // });
 
+const Feed = () => {
 
-  const nextProducts = [
-    {
-      id: 4,
-      category: "socks",
-      description: "littile kingdom girls",
-      image:  "https://i.pinimg.com/originals/b1/ea/f3/b1eaf39ee7f8260757288060480f9873.jpg",
-      price: 51,
-      title: "baby socks",
-      amount: "123",
-      slug: "magnetic-designs-women-printed-fit-and-flare-dress"
-      
-    },
-    {
-      id: 5,
-      category: "socks",
-      description: "littile kingdom boys",
-      image: "https://www.onesmallchild.com/wp-content/uploads/2014/11/Baby-Socks-for-Girls.jpg",
-      price: 85,
-      title: "baby socks",
-      amount: "123",
-      slug: "mango-self-striped-a-line-dress"
-    }
-  ]
+  const showProds = (section:string) => {
+    // setActive(section);
 
-const Feed =() => {
-  
+    const {
+      isFetching: loading,
+      isFetchingNextPage: loadingMore,
+      fetchNextPage,
+      hasNextPage,
+      data,
+      error,
+    } = useProductsQuery({
+      type: "clothing",
+      text: '',
+      category: section,
+      limit: 21,
+    });
+
+    console.log(prodData);
+  }
+
   const dodCart= useDodState();
 
-  const  data = getProducts;
-  
-  const otherdata = otherProducts;
+  //const  data = getProducts;
 
-  const nextdata = nextProducts;
+  const[activeSection,setActive] =useState('main-dress-boys');
 
-  const[activeSection,setActive] =useState('first');
 
-  // console.log("data",data);
-  
+
+  console.log("data",data);
+  console.log("D2",data?.pages);
+  var dat=data?.pages;
+
   // const getTotalItems = (items: CartItemType[]) => 
   //  items.reduce((ack: number, item) => ack + item.amount, 0);
   
+  
   const { openDodModal } = useModalAction();
 
-  const handleaddingtoselection =  ( clickedItem: CartItemType, clickedSection:string) => {
+  const dodSelect =  ( clickedItem: CartItemType, clickedSection:string) => {
     openDodModal("PRODUCT_DETAILS_DOD",clickedItem.slug, clickedSection);
   };
 
@@ -133,6 +140,7 @@ const Feed =() => {
       addItemToCart(dod, 1);
     } );
   }
+
 
 
   // const handleRemovefromCart = (id: number) =>{
@@ -167,34 +175,35 @@ const Feed =() => {
           </Badge>
         </StyledButton> */}
         <Card>
-          <div style={{cursor: "pointer"}} onClick={() => setActive('first')}>Dress</div>
-          <div style={{cursor: "pointer"}} onClick={() => setActive('second')}>Gloves</div>
-          <div  style={{cursor: "pointer"}} onClick={() => setActive('third')}>Socks</div>
+          <div style={{cursor: "pointer"}} onClick={() => showp('caps-boys')}>Main Dress</div>
+          <div style={{cursor: "pointer"}} onClick={() => setActive('caps-boys')}>Caps for Boys</div>
+          <div  style={{cursor: "pointer"}} onClick={() => setActive('socks-boys')}>Socks/Booties for Boys</div>
+          <div  style={{cursor: "pointer"}} onClick={() => setActive('gloves-boys')}>Gloves for Boys</div>
         </Card>
-        {(activeSection === 'first') && 
-        <Grid container spacing={3}>
-          {data?.map((item) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-3">
+        {loading && !data?.pages?.length ? (
+          <ProductFeedLoader limit={20} />
+        ) : (
+          <>
+            {data?.pages?.map((products, _idx) => (
+              <Fragment key={_idx}>
+                {products?.data?.map((product) => (
+                  <motion.div key={product.id}>
+                    {renderProductCard(product)}
+                  </motion.div>
+                ))}
+              </Fragment>
+            ))}
+          </>
+        )}
+      </div>
+        {/* <Grid container spacing={3}>
+          {dat?.map((item:any) => (
             <Grid item key={item.id} xs={12} sm={4}>
-              <DodItem item={item} section={activeSection} handleAddtoCart={handleaddingtoselection} />
+              <DodItem item={item} section={activeSection} handleAddtoCart={dodSelect} />
             </Grid>
           ))}
-        </Grid>}
-        {(activeSection === 'second') && 
-        <Grid container spacing={3}>
-          {otherdata?.map((item) => (
-            <Grid item key={item.id} xs={12} sm={4}>
-              <DodItem item={item} section={activeSection} handleAddtoCart={handleaddingtoselection} />
-            </Grid>
-          ))}
-        </Grid>}
-        {(activeSection === 'third') && 
-        <Grid container spacing={3}>
-          {nextdata?.map((item) => (
-            <Grid item key={item.id} xs={12} sm={4}>
-              <DodItem item={item} section={activeSection} handleAddtoCart={handleaddingtoselection} />
-            </Grid>
-          ))}
-        </Grid>}
+        </Grid> */}
         <Card >
           Items:
          

@@ -7,8 +7,12 @@ import { addActiveScroll } from "@utils/add-active-scroll";
 import { useUI } from "@contexts/ui.context";
 import dynamic from "next/dynamic";
 import { ROUTES } from "@utils/routes";
-import Link from "@components/ui/link";
+//import Link from "@components/ui/link";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import { url } from "inspector";
+import Feed from "src/pages/customoutfit"
+import { Link } from "react-router-dom";
 
 const AuthorizedMenu = dynamic(
   () => import("@components/layout/navbar/authorized-menu"),
@@ -21,6 +25,14 @@ const Navbar = () => {
   const { isAuthorize } = useUI();
   const { t } = useTranslation("common");
   addActiveScroll(navbarRef);
+
+  const router = useRouter();
+  const navigate = () => {
+    router.push({
+      pathname: "/customoutfit",
+      query: "boys",
+    });
+  };
 
   return (
     <header ref={navbarRef} className="site-header h-14 md:h-16 lg:h-22">
@@ -37,14 +49,15 @@ const Navbar = () => {
               </Link>
             </li>
           ) : null} */}
+        
           {siteSettings.headerLinks.map(({ href, label, icon }) => (
             <li key={`${href}${label}`}>
-              <NavLink activeClassName="text-accent" href={href}>
-                <a className="no-underline font-semibold flex items-center transition-colors duration-200 hover:text-accent focus:text-accent" >
+              { <NavLink activeClassName="text-accent" href={href}>
+                <a onClick={()=>{navigate()}} className="no-underline font-semibold flex items-center transition-colors duration-200 hover:text-accent focus:text-accent" >
                   {icon && <span className="me-2">{icon}</span>}
                   {t(label)}
                 </a>
-               </NavLink>
+               </NavLink> }
             </li>
           ))}
           {isAuthorize ? (

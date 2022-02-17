@@ -43,6 +43,8 @@ const useProductsQuery = (
     QueryKey
   >
 ) => {
+  //console.log(params);
+
   return useInfiniteQuery<PaginatedProduct, Error>(
     [API_ENDPOINTS.PRODUCTS, params],
     fetchProducts,
