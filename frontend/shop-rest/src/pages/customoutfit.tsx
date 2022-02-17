@@ -69,33 +69,20 @@ const getProducts = [
     }
   ]
 
-  // const {
-  //   isFetching: loading,
-  //   isFetchingNextPage: loadingMore,
-  //   fetchNextPage,
-  //   hasNextPage,
-  //   data,
-  //   error,
-  // } = useProductsQuery({
-  //   type: "clothing",
-  //   text: '',
-  //   category: 'main-dress-boys',
-  //   limit: 21,
-  // });
-
 const Feed = () => {
 
   const showProds = (section:string) => {
     // setActive(section);
 
-    const {
-      isFetching: loading,
-      isFetchingNextPage: loadingMore,
-      fetchNextPage,
-      hasNextPage,
-      data,
-      error,
-    } = useProductsQuery({
+    // const {
+    //   isFetching: loading,
+    //   isFetchingNextPage: loadingMore,
+    //   fetchNextPage,
+    //   hasNextPage,
+    //   data,
+    //   error,
+    // }
+    var prodData = useProductsQuery({
       type: "clothing",
       text: '',
       category: section,
@@ -111,11 +98,22 @@ const Feed = () => {
 
   const[activeSection,setActive] =useState('main-dress-boys');
 
-
+  const {
+    isFetching: loading,
+    isFetchingNextPage: loadingMore,
+    fetchNextPage,
+    hasNextPage,
+    data,
+    error,
+  } = useProductsQuery({
+    type: "clothing",
+    text: '',
+    category: 'main-dress-boys',
+    limit: 21,
+  });
 
   console.log("data",data);
   console.log("D2",data?.pages);
-  var dat=data?.pages;
 
   // const getTotalItems = (items: CartItemType[]) => 
   //  items.reduce((ack: number, item) => ack + item.amount, 0);
